@@ -34,7 +34,7 @@ function runDeamon () {
       const bunyan = childProcess.fork(
         path.join('.', 'node_modules', 'bunyan', 'bin', 'bunyan'),
         args,
-        { silent: true },
+        { silent: true }
       );
 
       bunyan.stdout.pipe(process.stdout);

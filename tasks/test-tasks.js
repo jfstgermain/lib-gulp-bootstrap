@@ -38,6 +38,7 @@ function remapCoverageFiles () {
 function runUnitTests (rootDir) {
   return () => gulp.src(`${rootDir}/test/unit/**/*.js`)
     .pipe(mocha({
+      // TODO: REMOVE THIS EXT DEP TO PARENT'S MODULE
       require: [`${rootDir}/test/utils/common`],
     }))
     .pipe(istanbul.writeReports())
