@@ -1,7 +1,6 @@
 const tsTasks           = require('./tasks/typescript-tasks');
 const processMonitTasks = require('./tasks/process-monit-tasks');
 const testTasks         = require('./tasks/test-tasks');
-const gulpSequence      = require('gulp-sequence');
 const guppy             = require('git-guppy');
 
 function bindBaseTasks (gulp) {
@@ -24,12 +23,14 @@ function bindBaseTasks (gulp) {
 
   // [Test related tasks]
   // Instrument code for coverage
-  gulp.task('pre-test', testTasks.preTest(tsTasks.tsDestPath));
+  gulp.task('pre-test', ['transpile'], testTasks.preTest(tsTasks.tsDestPath));
 
   // Run unit tests
-  gulp.task('test:unit', gulpSequence('transpile', 'pre-test'), testTasks.runUnitTests(tsTasks.tsDestPath));
+  gulp.task('test:unit', ['pre-test'], testTasks.runUnitTests(tsTasks.tsDestPath));
 
   // Run all test types
+  // NOTE: the `transpile` task needs to be added here to ensure it is
+  // ran first in `test:unit`
   gulp.task('test', ['test:unit']);
 
   /**
@@ -46,7 +47,7 @@ function bindBaseTasks (gulp) {
   /**
    * Default task.  Will execute tslint on all files first.
    */
-  gulp.task('default', gulpSequence('lint', 'watch'));
+  gulp.task('default', ['lint', 'watch']);
 
   /**
    * GIT pre-commit hook.  We're only linting at the moment

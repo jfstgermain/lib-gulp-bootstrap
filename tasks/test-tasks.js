@@ -25,7 +25,7 @@ function remapCoverageFiles () {
   .pipe(remapIstanbul({
     reports: {
       html: coverageDir,
-      'text-summary': null,
+      text: null,
       lcovonly: `${coverageDir}/lcov.info`,
     },
   }));
@@ -41,7 +41,10 @@ function runUnitTests (rootDir) {
       // TODO: REMOVE THIS EXT DEP TO PARENT'S MODULE
       require: [`${rootDir}/test/utils/common`],
     }))
-    .pipe(istanbul.writeReports())
+    // we only need the json report for the `remapIstanbul` module
+    .pipe(istanbul.writeReports({
+      reporters: ['json'],
+    }))
     // .pipe(istanbul.enforceThresholds({
     //   thresholds: { global: 90 },
     // }))

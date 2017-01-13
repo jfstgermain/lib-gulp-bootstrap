@@ -4,6 +4,7 @@ const sourcemaps = require('gulp-sourcemaps');
 const ts         = require('gulp-typescript');
 const tslint     = require('gulp-tslint');
 const gulpUtil   = require('gulp-util');
+const gulpCopy   = require('gulp-copy');
 const merge      = require('merge2');
 
 const tsProject  = ts.createProject('tsconfig.json');
@@ -37,11 +38,12 @@ function transpile (stream) {
   // Merge the two output streams, so this task is finished when
   // the IO of both operations is done.
   return merge([
-    tsResult.dts
-      .pipe(gulp.dest(tsDestPath)),
     tsResult.js
       .pipe(sourcemaps.write('.'))
       .pipe(gulp.dest(tsDestPath)),
+    // copy non js files to `dist/`
+    gulp.src(`${tsSrcPath}/**/*.json`)
+      .pipe(gulpCopy(tsDestPath, { prefix: 1 })),
   ]);
 }
 
