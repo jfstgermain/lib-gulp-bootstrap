@@ -32,7 +32,7 @@ function runDeamon () {
       }
       // Pass output through bunyan formatter
       const bunyan = childProcess.fork(
-        path.join('.', 'node_modules', 'bunyan', 'bin', 'bunyan'),
+        path.join('.', 'node_modules', 'lib-gulp-bootstrap', 'node_modules', 'bunyan', 'bin', 'bunyan'),
         args,
         { silent: true }
       );

@@ -36,6 +36,7 @@ function remapCoverageFiles () {
  * @param  {String} rootDir the root directory where the transpiled was written
  */
 function runUnitTests (rootDir) {
+  console.error(`${rootDir}/test/utils/common`)
   return () => gulp.src(`${rootDir}/test/unit/**/*.js`)
     .pipe(mocha({
       // TODO: REMOVE THIS EXT DEP TO PARENT'S MODULE
