@@ -22,14 +22,13 @@ function runDeamon (srcPath) {
           NODE_ENV: 'development',
         },
         tasks: ['transpile:clean:false'],
+        stdout: false,
+        readable: false,
       })
-      // .on('start', ['watch'])
-      // .on('change', ['watch'])
       .on('restart', () => {
-        console.log('Process restarted');
+        console.log('-> Process restarted <-');
       })
       .on('readable', () => {
-        console.error('******** READABLE');
         if (bunyan) {
           bunyan.kill();
         }
@@ -41,7 +40,7 @@ function runDeamon (srcPath) {
         }
         // Pass output through bunyan formatter
         bunyan = spawn(
-          path.join(process.cwd(), 'node_modules', 'lib-gulp-bootstrap', 'node_modules', 'bunyan', 'bin', 'bunyan'),
+          path.join(process.cwd(), 'node_modules', 'bunyan', 'bin', 'bunyan'),
           args
         );
 
