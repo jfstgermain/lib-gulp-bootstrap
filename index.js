@@ -18,8 +18,11 @@ function bindBaseTasks (gulp) {
   /**
    * Compile TypeScript and include references to library and app .d.ts files.
    */
-  gulp.task('transpile', ['lint', 'clean'], tsTasks.transpile);
+  gulp.task('transpile:clean:false', ['lint'], tsTasks.transpile);
 
+  gulp.task('transpile:clean:true', ['lint', 'clean'], tsTasks.transpile);
+
+  gulp.task('transpile', ['transpile:clean:true']);
 
   // [Test related tasks]
   // Instrument code for coverage
@@ -28,21 +31,24 @@ function bindBaseTasks (gulp) {
   // Run unit tests
   gulp.task('test:unit', ['pre-test'], testTasks.runUnitTests(tsTasks.tsDestPath));
 
+  // Run api tests
+  gulp.task('test:api', ['pre-test'], testTasks.runApiTests(tsTasks.tsDestPath));
+
   // Run all test types
   // NOTE: the `transpile` task needs to be added here to ensure it is
   // ran first in `test:unit`
-  gulp.task('test', ['test:unit']);
+  gulp.task('test', ['test:unit', 'test:api']);
 
   /**
    * Watch files under src/ for mods, lint and recompile them (incrementally)
    */
-  gulp.task('watch', tsTasks.watch(gulp, 'transpile'));
+  gulp.task('watch', tsTasks.watch(gulp, 'transpile:clean:false'));
 
   /**
    * Start server in dev mode. The code will be incrementally linted, compiled
    * and the server restarted uppon changes to the source files
    */
-  gulp.task('dev', ['transpile'], processMonitTasks.runDeamon);
+  gulp.task('dev', processMonitTasks.runDeamon(tsTasks.tsSrcPath));
 
   /**
    * Default task.  Will execute tslint on all files first.

@@ -31,13 +31,8 @@ function remapCoverageFiles () {
   }));
 }
 
-/**
- * Runs unit tests under `test/unit/`
- * @param  {String} rootDir the root directory where the transpiled was written
- */
-function runUnitTests (rootDir) {
-  console.error(`${rootDir}/test/utils/common`)
-  return () => gulp.src(`${rootDir}/test/unit/**/*.js`)
+function runTests (rootDir, testDir) {
+  return () => gulp.src(`${rootDir}/test/${testDir}/**/*.js`)
     .pipe(mocha({
       // TODO: REMOVE THIS EXT DEP TO PARENT'S MODULE
       require: [`${rootDir}/test/utils/common`],
@@ -52,7 +47,20 @@ function runUnitTests (rootDir) {
     .on('end', remapCoverageFiles);
 }
 
+/**
+ * Runs unit tests under `test/unit/`
+ * @param  {String} rootDir the root directory where the transpiled was written
+ */
+function runUnitTests (rootDir) {
+  return runTests(rootDir, 'unit');
+}
+
+function runApiTests (rootDir) {
+  return runTests(rootDir, 'api');
+}
+
 module.exports = {
   runUnitTests,
+  runApiTests,
   preTest,
 };
