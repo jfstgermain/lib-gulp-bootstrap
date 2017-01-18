@@ -48,7 +48,7 @@ function bindBaseTasks (gulp) {
    * Start server in dev mode. The code will be incrementally linted, compiled
    * and the server restarted uppon changes to the source files
    */
-  gulp.task('dev', processMonitTasks.runDeamon(tsTasks.tsSrcPath));
+  gulp.task('dev', ['transpile:clean:true'], processMonitTasks.runDeamon(tsTasks.tsSrcPath));
 
   /**
    * Default task.  Will execute tslint on all files first.
