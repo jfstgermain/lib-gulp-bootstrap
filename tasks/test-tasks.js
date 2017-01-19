@@ -36,7 +36,7 @@ function remapCoverageFiles () {
 function runTests (rootDir, testDir) {
   const mochaOpts = {
     require: [`${rootDir}/test/utils/common`],
-    reporter: argv.reporter || 'json',
+    reporter: argv.reporter || 'spec',
   };
 
   if (argv.reporterOutput) {
@@ -45,6 +45,7 @@ function runTests (rootDir, testDir) {
 
   return () => gulp.src(`${rootDir}/test/${testDir}/**/*.js`)
     .pipe(mocha(mochaOpts))
+    .once('error', () => process.exit(1))
     // we only need the json report for the `remapIstanbul` module
     .pipe(istanbul.writeReports({
       reporters: ['json'],
