@@ -1,6 +1,8 @@
 const gulp          = require('gulp');
+const _             = require('lodash');
 const mocha         = require('gulp-mocha');
 const istanbul      = require('gulp-istanbul');
+const argv          = require('yargs').argv;
 const remapIstanbul = require('remap-istanbul/lib/gulpRemapIstanbul');
 
 /**
@@ -32,11 +34,17 @@ function remapCoverageFiles () {
 }
 
 function runTests (rootDir, testDir) {
+  const mochaOpts = {
+    require: [`${rootDir}/test/utils/common`],
+    reporter: argv.reporter || 'json',
+  };
+
+  if (argv.reporterOutput) {
+    _.set(mochaOpts, 'reporterOptions.output', argv.reporterOutput)
+  }
+
   return () => gulp.src(`${rootDir}/test/${testDir}/**/*.js`)
-    .pipe(mocha({
-      // TODO: REMOVE THIS EXT DEP TO PARENT'S MODULE
-      require: [`${rootDir}/test/utils/common`],
-    }))
+    .pipe(mocha(mochaOpts))
     // we only need the json report for the `remapIstanbul` module
     .pipe(istanbul.writeReports({
       reporters: ['json'],

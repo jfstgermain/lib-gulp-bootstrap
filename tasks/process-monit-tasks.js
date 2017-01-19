@@ -23,12 +23,8 @@ function runDeamon (srcPath) {
         },
         tasks: ['transpile:clean:false'],
         stdout: false,
-        readable: false,
       })
-      .on('restart', () => {
-        console.log('-> Process restarted <-');
-      })
-      .on('readable', () => {
+      .on('readable', function () {
         if (bunyan) {
           bunyan.kill();
         }
