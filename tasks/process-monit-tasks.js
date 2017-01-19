@@ -3,7 +3,7 @@ const nodemon = require('gulp-nodemon');
 const fs      = require('fs');
 const spawn   = require('child_process').spawn;
 const _       = require('lodash');
-let args      = require('yargs').argv;
+let argv      = require('yargs').argv;
 
 // eslint-disable-next-line import/no-dynamic-require
 const appPackageConfig = require(`${process.cwd()}/package.json`);
@@ -29,15 +29,10 @@ function runDeamon (srcPath) {
           bunyan.kill();
         }
 
-        if (_.isEmpty(args)) {
-          // default bunyan cli args is none are passed.
-          // TODO: filter on bunyan args only (could be identified with a `--bunyan` flag)
-          args = ['--output', 'simple'];
-        }
         // Pass output through bunyan formatter
         bunyan = spawn(
           path.join(process.cwd(), 'node_modules', 'bunyan', 'bin', 'bunyan'),
-          args
+          argv.bunyan || ['--output', 'short', '--color']
         );
 
         bunyan.stdout.pipe(process.stdout);

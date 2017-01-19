@@ -24,3 +24,5 @@ Make sure the `main` entry in `package.json` points to the execution entry point
    In order to output `xunit` type reports, run the test command as follows: `gulp test --reporter xunit --reporter-output <a test report local file>.xml`
 5. `gulp watch`: monitors changes to files in the `/src` directory and runs the linter on changed files
 6. `gulp dev`: runs the linter and transpiles sources uppon changes and restarts the application for which the execution entry point is configured under `main` in the `package.json`
+
+   `bunyan` [options](https://github.com/trentm/node-bunyan#cli-usage) can also be passed in eg: `gulp dev -l warn -c 'this.service_name == "service_vmtl"'`
