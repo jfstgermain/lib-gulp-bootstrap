@@ -20,5 +20,7 @@ Make sure the `main` entry in `package.json` points to the execution entry point
 2. `gulp clean`: clears the `/dist` directory
 3. `gulp transpile`: transpiles typescript sources to javascript to `/dist`
 4. `gulp test`: executes transpiled tests under `/dist/test`.  Note that unit tests are expected to be under `/src/test/unit`
+
+   In order to output `xunit` type reports, run the test command as follows: `gulp test --reporter xunit --reporter-output <a test report local file>.xml`
 5. `gulp watch`: monitors changes to files in the `/src` directory and runs the linter on changed files
 6. `gulp dev`: runs the linter and transpiles sources uppon changes and restarts the application for which the execution entry point is configured under `main` in the `package.json`
