@@ -2,9 +2,14 @@ const tsTasks           = require('./tasks/typescript-tasks');
 const processMonitTasks = require('./tasks/process-monit-tasks');
 const testTasks         = require('./tasks/test-tasks');
 const guppy             = require('git-guppy');
+const releaseFlows      = require('gulp-release-flows');
 
 function bindBaseTasks (gulp) {
   const guppyInstance = guppy(gulp);
+
+  // Add release flows' module tasks
+  releaseFlows(gulp);
+
   /**
    * Lint all custom TypeScript files.
    */
@@ -56,9 +61,9 @@ function bindBaseTasks (gulp) {
   gulp.task('default', ['lint', 'watch']);
 
   /**
-   * GIT pre-commit hook.  We're only linting at the moment
+   * GIT pre-push hook.  We're only linting at the moment
    */
-  gulp.task('pre-commit', ['lint']);
+  gulp.task('pre-push', ['lint']);
 
   return gulp;
 }
