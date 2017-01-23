@@ -3,6 +3,8 @@ const processMonitTasks = require('./tasks/process-monit-tasks');
 const testTasks         = require('./tasks/test-tasks');
 const guppy             = require('git-guppy');
 const releaseFlows      = require('gulp-release-flows');
+const taskListing       = require('gulp-task-listing');
+const _                 = require('lodash');
 
 function bindBaseTasks (gulp) {
   const guppyInstance = guppy(gulp);
@@ -39,11 +41,6 @@ function bindBaseTasks (gulp) {
   // Run api tests
   gulp.task('test:api', ['pre-test'], testTasks.runApiTests(tsTasks.tsDestPath));
 
-  // Run all test types
-  // NOTE: the `transpile` task needs to be added here to ensure it is
-  // ran first in `test:unit`
-  gulp.task('test', ['test:unit', 'test:api']);
-
   /**
    * Watch files under src/ for mods, lint and recompile them (incrementally)
    */
@@ -64,6 +61,9 @@ function bindBaseTasks (gulp) {
    * GIT pre-push hook.  We're only linting at the moment
    */
   gulp.task('pre-push', ['lint']);
+
+  // Run all test types
+  gulp.task('test', _.keys(gulp.tasks).filter((taskName) => /test:/.test(taskName)));
 
   return gulp;
 }
