@@ -3,7 +3,6 @@ const processMonitTasks = require('./tasks/process-monit-tasks');
 const testTasks         = require('./tasks/test-tasks');
 const guppy             = require('git-guppy');
 const releaseFlows      = require('gulp-release-flows');
-const taskListing       = require('gulp-task-listing');
 const _                 = require('lodash');
 
 function bindBaseTasks (gulp) {
