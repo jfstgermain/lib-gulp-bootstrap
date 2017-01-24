@@ -47,10 +47,7 @@ function bindBaseTasks (gulp) {
   gulp.task('pre-test', ['transpile'], testTasks.preTest(tsTasks.tsDestPath));
 
   // Run unit tests
-  gulp.task('test:unit', ['pre-test'], testTasks.runUnitTests(tsTasks.tsDestPath));
-
-  // Run api tests
-  gulp.task('test:api', ['pre-test'], testTasks.runApiTests(tsTasks.tsDestPath));
+  gulp.task('test:unit', ['pre-test'], testTasks.runTests(tsTasks.tsDestPath));
 
   /**
    * Watch files under src/ for mods, lint and recompile them (incrementally)

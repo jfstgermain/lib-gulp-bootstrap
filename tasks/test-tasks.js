@@ -38,7 +38,7 @@ function remapCoverageFiles () {
     }));
 }
 
-function runTests (rootDir, testDir = '', requiredModules = []) {
+function runTests (rootDir, requiredModules = []) {
   // TODO: find a better way to do this and avoid using the module name in package.json...
   // (the module req-from used by gulp-mocha complicates things a bit)
   requiredModules.push(`${process.cwd()}/node_modules/${packageJson.name}/utils/test-common`);
@@ -53,9 +53,9 @@ function runTests (rootDir, testDir = '', requiredModules = []) {
   }
 
   return (cb) => {
-    assert(fs.existsSync(`${rootDir}/test/${testDir}`), `Test directory '${rootDir}/test/${testDir}' doesn't exist!`);
+    assert(fs.existsSync(`${rootDir}/test`), `Test directory '${rootDir}/test' doesn't exist!`);
 
-    gulp.src(`${rootDir}/test/${testDir}**/*.js`)
+    gulp.src(`${rootDir}/test/**/*.spec.js`)
       .pipe(mocha(mochaOpts))
       .once('error', () => process.exit(1))
       // we only need the json report for the `remapIstanbul` module
@@ -71,26 +71,6 @@ function runTests (rootDir, testDir = '', requiredModules = []) {
     }
 }
 
-/**
- * Runs unit tests under `test/unit/`
- * @param  {String} rootDir the root directory where the transpiled was written
- * @param  {Array} requiredModules required modules for running tests  Default
- *                                 ones used in `runTests` should be enough.
- */
-function runUnitTests (rootDir, requiredModules) {
-  return runTests(rootDir, 'unit', requiredModules);
-}
-
-/**
- * Runs unit tests under `test/api/`
- * @param  {String} rootDir the root directory where the transpiled was written
- * @param  {Array} requiredModules required modules for running tests  Default
- *                                 ones used in `runTests` should be enough.
- */
-function runApiTests (rootDir, requiredModules) {
-  return runTests(rootDir, 'api', requiredModules);
-}
-
 function clean () {
   return del([`${process.cwd()}/reports`, `${process.cwd()}/coverage`]);
 }
@@ -98,6 +78,5 @@ function clean () {
 module.exports = {
   clean,
   preTest,
-  runApiTests,
-  runUnitTests,
+  runTests,
 };
