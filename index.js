@@ -76,15 +76,15 @@ function bindBaseTasks (gulp) {
   });
 
   // Run all test types
-  // gulp.task('test', function (cb) {
-  //   // TODO: this invokes the `pre-test` task for each test type.
-  //   // refactor so `pre-test` is only executed once at the begining
-  //   // when invoking `gulp test`
-  //   const testTasks = _.keys(gulp.tasks).filter((taskName) => /test:/.test(taskName));
-  //
-  //   // Run in sequnce, otherwise the console output is all interwined between tasks
-  //   runSequence(...testTasks, cb);
-  // });
+  gulp.task('test', function (cb) {
+    // TODO: this invokes the `pre-test` task for each test type.
+    // refactor so `pre-test` is only executed once at the begining
+    // when invoking `gulp test`.  Upgrade to gulp 4.0 which supports
+    // executing tasks in series https://github.com/gulpjs/gulp/tree/4.0
+    const testTasks = _.keys(gulp.tasks).filter((taskName) => /test:/.test(taskName));
+    // Run in sequnce, otherwise the console output is all interwined between tasks
+    runSequence(...testTasks, cb);
+  });
 
   return gulp;
 }

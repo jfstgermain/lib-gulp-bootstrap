@@ -52,10 +52,10 @@ function runTests (rootDir, requiredModules = []) {
     _.set(mochaOpts, 'reporterOptions.output', argv.reporterOutput)
   }
 
-  return (cb) => {
+  return () => {
     assert(fs.existsSync(`${rootDir}/test`), `Test directory '${rootDir}/test' doesn't exist!`);
 
-    gulp.src(`${rootDir}/test/**/*.spec.js`)
+    return gulp.src(`${rootDir}/test/**/*.spec.js`)
       .pipe(mocha(mochaOpts))
       .once('error', () => process.exit(1))
       // we only need the json report for the `remapIstanbul` module
@@ -65,9 +65,7 @@ function runTests (rootDir, requiredModules = []) {
       // .pipe(istanbul.enforceThresholds({
       //   thresholds: { global: 90 },
       // }))
-      .on('end', () => {
-        remapCoverageFiles().on('end', cb);
-      });
+      .on('end', remapCoverageFiles);
     }
 }
 
