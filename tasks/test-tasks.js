@@ -4,6 +4,11 @@ const mocha         = require('gulp-mocha');
 const istanbul      = require('gulp-istanbul');
 const argv          = require('yargs').argv;
 const remapIstanbul = require('remap-istanbul/lib/gulpRemapIstanbul');
+const fs            = require('fs');
+const assert        = require('assert');
+const path          = require('path');
+const packageJson   = require('../package.json');
+const del           = require('del');
 
 /**
  * Code instrumentation for istanbul
@@ -24,18 +29,22 @@ function remapCoverageFiles () {
   const coverageDir = `${process.cwd()}/coverage`;
 
   return gulp.src(`${coverageDir}/coverage-final.json`)
-  .pipe(remapIstanbul({
-    reports: {
-      html: coverageDir,
-      text: null,
-      lcovonly: `${coverageDir}/lcov.info`,
-    },
-  }));
+    .pipe(remapIstanbul({
+      reports: {
+        html: coverageDir,
+        text: null,
+        lcovonly: `${coverageDir}/lcov.info`,
+      },
+    }));
 }
 
-function runTests (rootDir, testDir) {
+function runTests (rootDir, requiredModules = []) {
+  // TODO: find a better way to do this and avoid using the module name in package.json...
+  // (the module req-from used by gulp-mocha complicates things a bit)
+  requiredModules.push(`${process.cwd()}/node_modules/${packageJson.name}/utils/test-common`);
+
   const mochaOpts = {
-    require: [`${rootDir}/test/utils/common`],
+    require: requiredModules,
     reporter: argv.reporter || 'spec',
   };
 
@@ -43,33 +52,29 @@ function runTests (rootDir, testDir) {
     _.set(mochaOpts, 'reporterOptions.output', argv.reporterOutput)
   }
 
-  return () => gulp.src(`${rootDir}/test/${testDir}/**/*.js`)
-    .pipe(mocha(mochaOpts))
-    .once('error', () => process.exit(1))
-    // we only need the json report for the `remapIstanbul` module
-    .pipe(istanbul.writeReports({
-      reporters: ['json'],
-    }))
-    // .pipe(istanbul.enforceThresholds({
-    //   thresholds: { global: 90 },
-    // }))
-    .on('end', remapCoverageFiles);
+  return () => {
+    assert(fs.existsSync(`${rootDir}/test`), `Test directory '${rootDir}/test' doesn't exist!`);
+
+    return gulp.src(`${rootDir}/test/**/*.spec.js`)
+      .pipe(mocha(mochaOpts))
+      .once('error', () => process.exit(1))
+      // we only need the json report for the `remapIstanbul` module
+      .pipe(istanbul.writeReports({
+        reporters: ['json'],
+      }))
+      // .pipe(istanbul.enforceThresholds({
+      //   thresholds: { global: 90 },
+      // }))
+      .on('end', remapCoverageFiles);
+    }
 }
 
-/**
- * Runs unit tests under `test/unit/`
- * @param  {String} rootDir the root directory where the transpiled was written
- */
-function runUnitTests (rootDir) {
-  return runTests(rootDir, 'unit');
-}
-
-function runApiTests (rootDir) {
-  return runTests(rootDir, 'api');
+function clean () {
+  return del([`${process.cwd()}/reports`, `${process.cwd()}/coverage`]);
 }
 
 module.exports = {
-  runUnitTests,
-  runApiTests,
+  clean,
   preTest,
+  runTests,
 };
