@@ -8,6 +8,8 @@ const fs            = require('fs');
 const assert        = require('assert');
 const path          = require('path');
 const packageJson   = require('../package.json');
+const del           = require('del');
+
 /**
  * Code instrumentation for istanbul
  * @param  {String} rootDir the root directory where the transpiled code was written
@@ -27,16 +29,16 @@ function remapCoverageFiles () {
   const coverageDir = `${process.cwd()}/coverage`;
 
   return gulp.src(`${coverageDir}/coverage-final.json`)
-  .pipe(remapIstanbul({
-    reports: {
-      html: coverageDir,
-      text: null,
-      lcovonly: `${coverageDir}/lcov.info`,
-    },
-  }));
+    .pipe(remapIstanbul({
+      reports: {
+        html: coverageDir,
+        text: null,
+        lcovonly: `${coverageDir}/lcov.info`,
+      },
+    }));
 }
 
-function runTests (rootDir, testDir, requiredModules = []) {
+function runTests (rootDir, testDir = '', requiredModules = []) {
   // TODO: find a better way to do this and avoid using the module name in package.json...
   // (the module req-from used by gulp-mocha complicates things a bit)
   requiredModules.push(`${process.cwd()}/node_modules/${packageJson.name}/utils/test-common`);
@@ -50,10 +52,10 @@ function runTests (rootDir, testDir, requiredModules = []) {
     _.set(mochaOpts, 'reporterOptions.output', argv.reporterOutput)
   }
 
-  return () => {
-    assert(fs.existsSync(`${rootDir}/test/${testDir}/`), `Test directory '${rootDir}/test/${testDir}/' doesn't exist!`);
+  return (cb) => {
+    assert(fs.existsSync(`${rootDir}/test/${testDir}`), `Test directory '${rootDir}/test/${testDir}' doesn't exist!`);
 
-    return gulp.src(`${rootDir}/test/${testDir}/**/*.js`)
+    gulp.src(`${rootDir}/test/${testDir}**/*.js`)
       .pipe(mocha(mochaOpts))
       .once('error', () => process.exit(1))
       // we only need the json report for the `remapIstanbul` module
@@ -63,7 +65,9 @@ function runTests (rootDir, testDir, requiredModules = []) {
       // .pipe(istanbul.enforceThresholds({
       //   thresholds: { global: 90 },
       // }))
-      .on('end', remapCoverageFiles);
+      .on('end', () => {
+        remapCoverageFiles().on('end', cb);
+      });
     }
 }
 
@@ -87,8 +91,13 @@ function runApiTests (rootDir, requiredModules) {
   return runTests(rootDir, 'api', requiredModules);
 }
 
+function clean () {
+  return del([`${process.cwd()}/reports`, `${process.cwd()}/coverage`]);
+}
+
 module.exports = {
-  runUnitTests,
-  runApiTests,
+  clean,
   preTest,
+  runApiTests,
+  runUnitTests,
 };

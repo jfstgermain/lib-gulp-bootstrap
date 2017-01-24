@@ -4,10 +4,12 @@ const testTasks         = require('./tasks/test-tasks');
 const guppy             = require('git-guppy');
 const releaseFlows      = require('gulp-release-flows');
 const _                 = require('lodash');
+let runSequence         = require('run-sequence');
 
 function bindBaseTasks (gulp) {
   const guppyInstance = guppy(gulp);
 
+  runSequence = runSequence.use(gulp);
   // Add release flows' module tasks
   releaseFlows(gulp);
 
@@ -17,16 +19,26 @@ function bindBaseTasks (gulp) {
   gulp.task('lint', tsTasks.lint);
 
   /**
+   * Deletes the `dist/` directory
+   */
+  gulp.task('test:clean', testTasks.clean);
+
+  /**
+   * Deletes the `coverage/` and `reports/` directories
+   */
+  gulp.task('typescript:clean', tsTasks.clean);
+
+  /**
   * Remove all generated JavaScript files from TypeScript compilation.
   */
-  gulp.task('clean', tsTasks.clean);
+  gulp.task('clean', ['test:clean', 'typescript:clean']);
 
   /**
    * Compile TypeScript and include references to library and app .d.ts files.
    */
   gulp.task('transpile:clean:false', ['lint'], tsTasks.transpile);
 
-  gulp.task('transpile:clean:true', ['lint', 'clean'], tsTasks.transpile);
+  gulp.task('transpile:clean:true', ['lint', 'typescript:clean'], tsTasks.transpile);
 
   gulp.task('transpile', ['transpile:clean:true']);
 
@@ -61,8 +73,21 @@ function bindBaseTasks (gulp) {
    */
   gulp.task('pre-push', ['lint']);
 
+  gulp.task('test', function () {
+    const testTasks = _.keys(gulp.tasks).filter((taskName) => /test:/.test(taskName));
+    return gulp.start(testTasks);
+  });
+
   // Run all test types
-  gulp.task('test', _.keys(gulp.tasks).filter((taskName) => /test:/.test(taskName)));
+  // gulp.task('test', function (cb) {
+  //   // TODO: this invokes the `pre-test` task for each test type.
+  //   // refactor so `pre-test` is only executed once at the begining
+  //   // when invoking `gulp test`
+  //   const testTasks = _.keys(gulp.tasks).filter((taskName) => /test:/.test(taskName));
+  //
+  //   // Run in sequnce, otherwise the console output is all interwined between tasks
+  //   runSequence(...testTasks, cb);
+  // });
 
   return gulp;
 }
