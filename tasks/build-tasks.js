@@ -1,16 +1,26 @@
 const _ = require('lodash');
 
-function preTranspile(gulp) {
-  return () => {
-    const preTranspileTasks = _.keys(gulp.tasks).filter((taskName) => /build:pre-transpile:/.test(taskName));
-    return gulp.start(preTranspileTasks);
+function runParallel (runSequence, tasks, cb) {
+  if (!_.isEmpty(tasks)) {
+    // note that tasks are in an array, thus ran in parallel
+    // see https://www.npmjs.com/package/run-sequence
+    runSequence(tasks, cb);
+  } else {
+    cb();
   }
 }
 
-function postTranspile(gulp) {
-  return () => {
+function preTranspile(gulp, runSequence) {
+  return (cb) => {
+    const preTranspileTasks = _.keys(gulp.tasks).filter((taskName) => /build:pre-transpile:/.test(taskName));
+    runParallel(runSequence, preTranspileTasks, cb);
+  }
+}
+
+function postTranspile(gulp, runSequence) {
+  return (cb) => {
     const postTranspileTasks = _.keys(gulp.tasks).filter((taskName) => /build:post-transpile:/.test(taskName));
-    return gulp.start(postTranspileTasks);
+    runParallel(runSequence, postTranspileTasks, cb);
   }
 }
 

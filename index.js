@@ -5,6 +5,9 @@ const buildTasks        = require('./tasks/build-tasks');
 const guppy             = require('git-guppy');
 const releaseFlows      = require('gulp-release-flows');
 const _                 = require('lodash');
+
+// TODO: `run-sequence` won't be necessary once migrated to gulp@4.0
+// see https://fettblog.eu/gulp-4-parallel-and-series/
 let runSequence         = require('run-sequence');
 
 function bindBaseTasks (gulp) {
@@ -78,19 +81,20 @@ function bindBaseTasks (gulp) {
    * Executes build tasks that needs to be executed before the transpilation
    * step
    */
-  gulp.task('build:pre-transpile', buildTasks.preTranspile(gulp));
+  gulp.task('build:pre-transpile', buildTasks.preTranspile(gulp, runSequence));
 
   /**
    * Intermediary tasks that sets a dependance on the pre-transpilation build step
+   * Using a callback: we want to wait for the task to complete and not stream
    */
-  gulp.task('build:transpile', ['build:pre-transpile'], function () {
-    return gulp.start('transpile');
+  gulp.task('build:transpile', ['build:pre-transpile'], function (cb) {
+    runSequence('transpile', cb);
   });
 
   /**
    * Executes build tasks that needs to be executed after the transpilation step
    */
-  gulp.task('build:post-transpile', ['build:transpile'], buildTasks.preTranspile(gulp));
+  gulp.task('build:post-transpile', ['build:transpile'], buildTasks.postTranspile(gulp, runSequence));
 
   /**
    * Alias for `build:post-transpile`
