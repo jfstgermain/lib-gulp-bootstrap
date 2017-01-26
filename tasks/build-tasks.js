@@ -1,3 +1,5 @@
+const _ = require('lodash');
+
 function preTranspile() {
   const preTranspileTasks = _.keys(gulp.tasks).filter((taskName) => /build:pre-transpile:/.test(taskName));
   return gulp.start(preTranspileTasks);
