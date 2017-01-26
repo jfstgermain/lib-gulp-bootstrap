@@ -78,7 +78,7 @@ function bindBaseTasks (gulp) {
    * Executes build tasks that needs to be executed before the transpilation
    * step
    */
-  gulp.task('build:pre-transpile', buildTasks.preTranspile);
+  gulp.task('build:pre-transpile', buildTasks.preTranspile(gulp));
 
   /**
    * Intermediary tasks that sets a dependance on the pre-transpilation build step
@@ -90,7 +90,7 @@ function bindBaseTasks (gulp) {
   /**
    * Executes build tasks that needs to be executed after the transpilation step
    */
-  gulp.task('build:post-transpile', ['build:transpile'], buildTasks.preTranspile);
+  gulp.task('build:post-transpile', ['build:transpile'], buildTasks.preTranspile(gulp));
 
   /**
    * Alias for `build:post-transpile`
