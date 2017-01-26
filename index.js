@@ -1,6 +1,7 @@
 const tsTasks           = require('./tasks/typescript-tasks');
 const processMonitTasks = require('./tasks/process-monit-tasks');
 const testTasks         = require('./tasks/test-tasks');
+const buildTasks        = require('./tasks/build-tasks');
 const guppy             = require('git-guppy');
 const releaseFlows      = require('gulp-release-flows');
 const _                 = require('lodash');
@@ -34,20 +35,23 @@ function bindBaseTasks (gulp) {
   gulp.task('clean', ['test:clean', 'typescript:clean']);
 
   /**
-   * Compile TypeScript and include references to library and app .d.ts files.
+   * Compiles TypeScript and includes references to library and app .d.ts files.
+   * It doesn't delete the `dist/` directory (useful for incremental transpilation
+   * in the `dev` task)
    */
   gulp.task('transpile:clean:false', ['lint'], tsTasks.transpile);
 
+  /**
+   * Compiles TypeScript and includes references to library and app .d.ts files.
+   * The `dist/` directory is being deleted first
+   */
   gulp.task('transpile:clean:true', ['lint', 'typescript:clean'], tsTasks.transpile);
 
+  /**
+   * Alias for the `transpile:clean:true` task
+   */
   gulp.task('transpile', ['transpile:clean:true']);
 
-  // [Test related tasks]
-  // Instrument code for coverage
-  gulp.task('pre-test', ['transpile'], testTasks.preTest(tsTasks.tsDestPath));
-
-  // Run unit tests
-  gulp.task('test:unit', ['pre-test'], testTasks.runTests(tsTasks.tsDestPath));
 
   /**
    * Watch files under src/ for mods, lint and recompile them (incrementally)
@@ -70,10 +74,35 @@ function bindBaseTasks (gulp) {
    */
   gulp.task('pre-push', ['lint']);
 
-  gulp.task('test', function () {
-    const testTasks = _.keys(gulp.tasks).filter((taskName) => /test:/.test(taskName));
-    return gulp.start(testTasks);
+  /**
+   * Executes build tasks that needs to be executed before the transpilation
+   * step
+   */
+  gulp.task('build:pre-transpile', buildTasks.preTranspile);
+
+  /**
+   * Intermediary tasks that sets a dependance on the pre-transpilation build step
+   */
+  gulp.task('build:transpile', ['build:pre-transpile'], function () {
+    return gulp.start('transpile');
   });
+
+  /**
+   * Executes build tasks that needs to be executed after the transpilation step
+   */
+  gulp.task('build:post-transpile', ['build:transpile'], buildTasks.preTranspile);
+
+  /**
+   * Alias for `build:post-transpile`
+   */
+  gulp.task('build', ['build:post-transpile']);
+
+  // [Test related tasks]
+  // Instrument code for coverage
+  gulp.task('pre-test', ['build'], testTasks.preTest(tsTasks.tsDestPath));
+
+  // Run unit tests
+  gulp.task('test:unit', ['pre-test'], testTasks.runTests(tsTasks.tsDestPath));
 
   // Run all test types
   gulp.task('test', function (cb) {
