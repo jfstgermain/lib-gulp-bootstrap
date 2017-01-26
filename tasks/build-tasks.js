@@ -26,7 +26,7 @@ function runParallel (runSequence, tasks, cb) {
 
 function filterTasks (tasks, prefixRegEx) {
   return _.keys(tasks).filter((taskName) =>  {
-    return prefixRegEx.test(taskName) && !_include(excludedBuildTasks, taskName);
+    return prefixRegEx.test(taskName) && !_.include(excludedBuildTasks, taskName);
   });
 }
 
