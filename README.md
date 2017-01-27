@@ -32,4 +32,4 @@ Make sure the `main` entry in `package.json` points to the execution entry point
 8. `gulp build:post-transpile:<sub-task>`: all tasks prefixed by `build:post-transpile:` will be triggered when invoking `gulp:build`, and this _**after**_ the transpilation step.
 9. `gulp build:<sub-release-flows-task>`: useful tasks for tagging versions of a module. The abailable subtasks provided by the module are: `build:release`, `build:bump-version`, `build:changelog`, `build:commit-changes`, `build:push-changes`, `build:create-new-tag`.  The most useful sub-task in this list is `build:release`. See external module [documentation](https://github.com/indexiatech/gulp-release-flows)
 
-[Gulp Recipies](https://github.com/gulpjs/gulp/tree/master/docs/recipes)
+Take a look at: [Gulp Recipies](https://github.com/gulpjs/gulp/tree/master/docs/recipes)
