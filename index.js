@@ -74,7 +74,7 @@ function bindBaseTasks (gulp) {
   /**
    * Default task.  Will execute tslint on all files first.
    */
-  gulp.task('default', ['lint', 'watch']);
+  gulp.task('default', ['transpile']);
 
   /**
    * GIT pre-push hook.  We're only linting at the moment
