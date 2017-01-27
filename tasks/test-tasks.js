@@ -33,6 +33,7 @@ function remapCoverageFiles () {
       reports: {
         html: coverageDir,
         text: null,
+        cobertura: coverageDir,
         lcovonly: `${coverageDir}/lcov.info`,
       },
     }));
