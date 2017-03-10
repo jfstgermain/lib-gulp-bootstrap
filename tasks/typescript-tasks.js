@@ -42,7 +42,7 @@ function transpile (stream) {
       .pipe(sourcemaps.write('.'))
       .pipe(gulp.dest(tsDestPath)),
     // copy non js files to `dist/`
-    gulp.src(`${tsSrcPath}/**/*.json`)
+    gulp.src(`${tsSrcPath}/**/*(*.json|*.yaml|*.yml)`)
       .pipe(gulpCopy(tsDestPath, { prefix: 1 })),
   ]);
 }
